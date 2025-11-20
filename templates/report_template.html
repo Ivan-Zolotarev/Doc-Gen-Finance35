@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Финансовый отчет</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+        }
+        h1 {
+            text-align: center;
+            color: #333;
+        }
+        .header {
+            margin-bottom: 30px;
+        }
+        .info {
+            margin: 10px 0;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+        .footer {
+            margin-top: 40px;
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+    <h1>ФИНАНСОВЫЙ ОТЧЕТ</h1>
+    
+    <div class="header">
+        <div class="info"><strong>Организация:</strong> {{company_name}}</div>
+        <div class="info"><strong>ИНН:</strong> {{inn}}</div>
+        <div class="info"><strong>ОГРН:</strong> {{ogrn}}</div>
+        <div class="info"><strong>Период:</strong> {{period_start}} - {{period_end}}</div>
+        <div class="info"><strong>Дата формирования:</strong> {{date}}</div>
+    </div>
+    
+    <h2>Основные показатели</h2>
+    <table>
+        <tr>
+            <th>Показатель</th>
+            <th>Значение</th>
+        </tr>
+        <tr>
+            <td>Выручка</td>
+            <td>{{revenue}} руб.</td>
+        </tr>
+        <tr>
+            <td>Расходы</td>
+            <td>{{expenses}} руб.</td>
+        </tr>
+        <tr>
+            <td>Прибыль</td>
+            <td>{{profit}} руб.</td>
+        </tr>
+    </table>
+    
+    <div class="footer">
+        <p>Подпись: {{signature}}</p>
+        <p>Дата: {{date}}</p>
+    </div>
+</body>
+</html>
+

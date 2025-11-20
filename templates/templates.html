@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block title %}Шаблоны - Doc-Gen-Finance35{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>Доступные шаблоны</h1>
+    <p>Список шаблонов документов для генерации</p>
+</div>
+
+<div class="templates-list">
+    {% if templates %}
+        {% for template in templates %}
+        <div class="template-card">
+            <div class="template-icon">
+                {% if template.type == 'word' %}
+                    📝
+                {% elif template.type == 'pdf' %}
+                    📄
+                {% else %}
+                    📊
+                {% endif %}
+            </div>
+            <div class="template-info">
+                <h3>{{ template.name }}</h3>
+                <p class="template-type">Тип: {{ template.type }}</p>
+                <p class="template-path">{{ template.path }}</p>
+            </div>
+            <div class="template-actions">
+                <a href="{{ url_for('index') }}?template={{ template.name }}" class="btn btn-primary">Использовать</a>
+            </div>
+        </div>
+        {% endfor %}
+    {% else %}
+        <div class="empty-state">
+            <p>Шаблоны не найдены</p>
+            <p>Создайте шаблоны, запустив: <code>python templates/create_templates.py</code></p>
+        </div>
+    {% endif %}
+</div>
+
+<div class="info-box">
+    <h3>Как использовать шаблоны?</h3>
+    <ol>
+        <li>Выберите тип документа на главной странице</li>
+        <li>Загрузите шаблон при создании документа (опционально)</li>
+        <li>Заполните необходимые поля</li>
+        <li>Нажмите "Сгенерировать документ"</li>
+    </ol>
+</div>
+{% endblock %}
+

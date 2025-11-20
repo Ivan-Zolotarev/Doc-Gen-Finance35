@@ -1,0 +1,257 @@
+{% extends "base.html" %}
+
+{% block title %}Генератор документов - Doc-Gen-Finance35{% endblock %}
+
+{% block content %}
+<div class="hero">
+    <h1>Генератор документов</h1>
+    <p>Автоматическая генерация документов в форматах Word, PDF и Excel</p>
+</div>
+
+<div class="document-types">
+    <div class="doc-type-card" data-type="word">
+        <div class="doc-icon">📝</div>
+        <h3>Word документ</h3>
+        <p>Создание документов Microsoft Word (.docx)</p>
+        <button class="btn btn-primary" onclick="showForm('word')">Создать</button>
+    </div>
+
+    <div class="doc-type-card" data-type="pdf">
+        <div class="doc-icon">📄</div>
+        <h3>PDF документ</h3>
+        <p>Генерация PDF документов</p>
+        <button class="btn btn-primary" onclick="showForm('pdf')">Создать</button>
+    </div>
+
+    <div class="doc-type-card" data-type="excel">
+        <div class="doc-icon">📊</div>
+        <h3>Excel таблица</h3>
+        <p>Создание таблиц Microsoft Excel (.xlsx)</p>
+        <button class="btn btn-primary" onclick="showForm('excel')">Создать</button>
+    </div>
+</div>
+
+<!-- Форма для Word -->
+<div id="form-word" class="generation-form" style="display: none;">
+    <h2>Генерация Word документа</h2>
+    <form id="word-form" enctype="multipart/form-data">
+        <input type="hidden" name="doc_type" value="word">
+        
+        <div class="form-group">
+            <label>Шаблон (опционально)</label>
+            <input type="file" name="template_file" accept=".docx" class="form-control">
+            <small>Загрузите шаблон Word или оставьте пустым для создания нового документа</small>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Номер договора</label>
+                <input type="text" name="contract_number" class="form-control" placeholder="ДГ-2024-001">
+            </div>
+            <div class="form-group">
+                <label>Дата</label>
+                <input type="date" name="date" class="form-control" value="{{ today }}">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Сторона 1 (Заказчик)</label>
+                <input type="text" name="party1_name" class="form-control" placeholder="ООО 'Компания'">
+            </div>
+            <div class="form-group">
+                <label>Сторона 2 (Исполнитель)</label>
+                <input type="text" name="party2_name" class="form-control" placeholder="ООО 'Система Связи'">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Предмет договора</label>
+            <textarea name="subject" class="form-control" rows="3" placeholder="Описание предмета договора"></textarea>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Сумма</label>
+                <input type="text" name="amount" class="form-control" placeholder="500 000">
+            </div>
+            <div class="form-group">
+                <label>Срок выполнения</label>
+                <input type="date" name="deadline" class="form-control">
+            </div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-group">
+                <label>Подпись заказчика</label>
+                <input type="text" name="customer_signature" class="form-control" placeholder="Иванов И.И.">
+            </div>
+            <div class="form-group">
+                <label>Подпись исполнителя</label>
+                <input type="text" name="executor_signature" class="form-control" placeholder="Веселенко Т.Н.">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label>Дополнительное содержимое</label>
+            <textarea name="content" class="form-control" rows="5" placeholder="Дополнительный текст документа"></textarea>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Сгенерировать документ</button>
+            <button type="button" class="btn btn-secondary" onclick="hideForm('word')">Отмена</button>
+        </div>
+    </form>
+</div>
+
+<!-- Форма для PDF -->
+<div id="form-pdf" class="generation-form" style="display: none;">
+    <h2>Генерация PDF документа</h2>
+    <form id="pdf-form" enctype="multipart/form-data">
+        <input type="hidden" name="doc_type" value="pdf">
+        
+        <div class="form-group">
+            <label>Заголовок</label>
+            <input type="text" name="title" class="form-control" placeholder="Финансовый отчет" required>
+        </div>
+
+        <div class="form-group">
+            <label>Дата</label>
+            <input type="date" name="date" class="form-control" value="{{ today }}" required>
+        </div>
+
+        <div class="form-group">
+            <label>Содержимое</label>
+            <textarea name="content" class="form-control" rows="8" placeholder="Текст документа" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label>Подпись</label>
+            <input type="text" name="signature" class="form-control" placeholder="Иванов И.И.">
+        </div>
+
+        <div class="form-group">
+            <label>Табличные данные (JSON)</label>
+            <textarea name="table_data" class="form-control" rows="6" placeholder='[["Заголовок1", "Заголовок2"], ["Данные1", "Данные2"]]'></textarea>
+            <small>Введите данные таблицы в формате JSON массива массивов</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Сгенерировать PDF</button>
+            <button type="button" class="btn btn-secondary" onclick="hideForm('pdf')">Отмена</button>
+        </div>
+    </form>
+</div>
+
+<!-- Форма для Excel -->
+<div id="form-excel" class="generation-form" style="display: none;">
+    <h2>Генерация Excel таблицы</h2>
+    <form id="excel-form" enctype="multipart/form-data">
+        <input type="hidden" name="doc_type" value="excel">
+        
+        <div class="form-group">
+            <label>Заголовок отчета</label>
+            <input type="text" name="title" class="form-control" placeholder="Финансовый отчет" required>
+        </div>
+
+        <div class="form-group">
+            <label>Название листа</label>
+            <input type="text" name="sheet_name" class="form-control" placeholder="Отчет" value="Лист1">
+        </div>
+
+        <div class="form-group">
+            <label>Табличные данные (JSON)</label>
+            <textarea name="table_data" class="form-control" rows="10" placeholder='[["Месяц", "Выручка", "Расходы"], ["Январь", "35000", "28000"], ["Февраль", "38000", "30000"]]' required></textarea>
+            <small>Введите данные таблицы в формате JSON. Первая строка - заголовки.</small>
+        </div>
+
+        <div class="form-group">
+            <label>Дополнительные данные (JSON, опционально)</label>
+            <textarea name="additional_data" class="form-control" rows="4" placeholder='{"Средняя выручка": "38333 руб.", "Средние расходы": "30000 руб."}'></textarea>
+            <small>Введите дополнительные данные в формате JSON объекта</small>
+        </div>
+
+        <div class="form-actions">
+            <button type="submit" class="btn btn-success">Сгенерировать Excel</button>
+            <button type="button" class="btn btn-secondary" onclick="hideForm('excel')">Отмена</button>
+        </div>
+    </form>
+</div>
+
+<div id="loading" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p>Генерация документа...</p>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    const today = new Date().toISOString().split('T')[0];
+    document.querySelectorAll('input[type="date"]').forEach(input => {
+        if (!input.value) {
+            input.value = today;
+        }
+    });
+
+    function showForm(type) {
+        document.querySelectorAll('.generation-form').forEach(form => {
+            form.style.display = 'none';
+        });
+        document.getElementById(`form-${type}`).style.display = 'block';
+        document.getElementById(`form-${type}`).scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function hideForm(type) {
+        document.getElementById(`form-${type}`).style.display = 'none';
+    }
+
+    // Обработка форм
+    document.getElementById('word-form').addEventListener('submit', handleSubmit);
+    document.getElementById('pdf-form').addEventListener('submit', handleSubmit);
+    document.getElementById('excel-form').addEventListener('submit', handleSubmit);
+
+    function handleSubmit(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        
+        // Показываем загрузку
+        document.getElementById('loading').style.display = 'flex';
+        
+        fetch('/generate', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            return response.json().then(err => Promise.reject(err));
+        })
+        .then(blob => {
+            // Создаем ссылку для скачивания
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = formData.get('doc_type') === 'word' ? 'document.docx' : 
+                        formData.get('doc_type') === 'pdf' ? 'document.pdf' : 'document.xlsx';
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+            
+            // Скрываем загрузку
+            document.getElementById('loading').style.display = 'none';
+            
+            // Показываем сообщение об успехе
+            alert('Документ успешно сгенерирован и скачан!');
+            form.reset();
+        })
+        .catch(error => {
+            document.getElementById('loading').style.display = 'none';
+            alert('Ошибка: ' + (error.error || error.message || 'Неизвестная ошибка'));
+        });
+    }
+</script>
+{% endblock %}
+

@@ -1,0 +1,21 @@
+{
+  "documents": [
+    {
+      "type": "word",
+      "template": "templates/contract_template.docx",
+      "output": "output/contract_example.docx",
+      "data": {
+        "contract_number": "ДГ-2024-001",
+        "date": "20.12.2024",
+        "party1_name": "ООО 'Система Связи'",
+        "party2_name": "ООО 'Клиент'",
+        "subject": "Разработка ПО",
+        "amount": "500 000",
+        "deadline": "31.12.2024",
+        "customer_signature": "Иванов И.И.",
+        "executor_signature": "Веселенко Т.Н."
+      }
+    }
+  ]
+}
+
