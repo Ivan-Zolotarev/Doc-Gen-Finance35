@@ -1,0 +1,214 @@
+{% extends "base.html" %}
+
+{% block title %}Документация из кода - Doc-Gen-Finance35{% endblock %}
+
+{% block content %}
+<div class="page-header">
+    <h1>💻 Документация из кода</h1>
+    <p>Загрузите Python файл или архив проекта для автоматической генерации документации</p>
+</div>
+
+<div class="tabs">
+    <button class="tab-btn active" onclick="showTab('single')">Один файл</button>
+    <button class="tab-btn" onclick="showTab('project')">Проект (ZIP)</button>
+</div>
+
+<!-- Форма для одного файла -->
+<div id="tab-single" class="tab-content active">
+    <div class="upload-card">
+        <h2>Анализ одного файла</h2>
+        <form id="code-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Python файл</label>
+                <input type="file" name="code_file" accept=".py" class="form-control" required>
+                <small>Загрузите .py файл для анализа</small>
+            </div>
+
+            <div class="form-group">
+                <label>Формат вывода</label>
+                <select name="format" class="form-control">
+                    <option value="markdown">Markdown (.md)</option>
+                    <option value="json">JSON (.json)</option>
+                </select>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">Сгенерировать документацию</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Форма для проекта -->
+<div id="tab-project" class="tab-content">
+    <div class="upload-card">
+        <h2>Анализ проекта</h2>
+        <form id="project-form" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Архив проекта (ZIP)</label>
+                <input type="file" name="project_zip" accept=".zip" class="form-control" required>
+                <small>Загрузите ZIP архив с Python файлами проекта</small>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="btn btn-success">Сгенерировать документацию проекта</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div id="loading" class="loading-overlay" style="display: none;">
+    <div class="loading-spinner"></div>
+    <p>Анализ кода и генерация документации...</p>
+</div>
+
+<div class="info-box">
+    <h3>Что будет сгенерировано?</h3>
+    <ul>
+        <li>📋 Структура модулей и классов</li>
+        <li>📝 Описание функций с параметрами</li>
+        <li>💬 Docstrings и комментарии</li>
+        <li>🔗 Импорты и зависимости</li>
+        <li>📊 Диаграммы классов (для проектов)</li>
+    </ul>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showTab(tabName) {
+    document.querySelectorAll('.tab-content').forEach(tab => {
+        tab.classList.remove('active');
+    });
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('active');
+    });
+    
+    document.getElementById(`tab-${tabName}`).classList.add('active');
+    event.target.classList.add('active');
+}
+
+document.getElementById('code-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    document.getElementById('loading').style.display = 'flex';
+    
+    fetch('/analyze-code', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        }
+        return response.json().then(err => Promise.reject(err));
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'documentation.md';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        document.getElementById('loading').style.display = 'none';
+        alert('Документация успешно сгенерирована!');
+    })
+    .catch(error => {
+        document.getElementById('loading').style.display = 'none';
+        alert('Ошибка: ' + (error.error || error.message || 'Неизвестная ошибка'));
+    });
+});
+
+document.getElementById('project-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    
+    document.getElementById('loading').style.display = 'flex';
+    
+    fetch('/analyze-project', {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => {
+        if (response.ok) {
+            return response.blob();
+        }
+        return response.json().then(err => Promise.reject(err));
+    })
+    .then(blob => {
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'project_documentation.md';
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+        
+        document.getElementById('loading').style.display = 'none';
+        alert('Документация проекта успешно сгенерирована!');
+    })
+    .catch(error => {
+        document.getElementById('loading').style.display = 'none';
+        alert('Ошибка: ' + (error.error || error.message || 'Неизвестная ошибка'));
+    });
+});
+</script>
+
+<style>
+.tabs {
+    display: flex;
+    gap: 1rem;
+    margin: 2rem 0;
+    border-bottom: 2px solid var(--border-color);
+}
+
+.tab-btn {
+    padding: 1rem 2rem;
+    background: none;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 500;
+    color: #666;
+    transition: all 0.3s;
+}
+
+.tab-btn.active {
+    color: var(--primary-color);
+    border-bottom-color: var(--primary-color);
+}
+
+.tab-content {
+    display: none;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+.upload-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 10px;
+    box-shadow: var(--shadow);
+    margin: 2rem 0;
+}
+
+.page-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.page-header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+}
+</style>
+{% endblock %}
+

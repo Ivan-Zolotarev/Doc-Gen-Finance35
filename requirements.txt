@@ -8,4 +8,8 @@ PyPDF2==3.0.1
 fpdf2==2.7.6
 flask==3.0.0
 werkzeug==3.0.1
+astunparse==1.6.3
+markdown==3.5.1
+sqlalchemy==2.0.23
+pygments==2.17.2
 
