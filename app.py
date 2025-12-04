@@ -60,8 +60,36 @@ def generate_document():
         data = {}
         for key, value in request.form.items():
             if key != 'doc_type' and key != 'template_file':
-                if value:
-                    data[key] = value
+                # Сохраняем все значения, даже пустые (для замены плейсхолдеров)
+                data[key] = value if value else ''
+        
+        # Обрабатываем дату - преобразуем из YYYY-MM-DD в DD.MM.YYYY
+        if 'date' in data and data['date']:
+            try:
+                date_obj = datetime.strptime(data['date'], '%Y-%m-%d')
+                data['date'] = date_obj.strftime('%d.%m.%Y')
+            except Exception as e:
+                # Если не удалось преобразовать, оставляем как есть
+                print(f"Ошибка преобразования даты: {e}")
+        
+        # Обрабатываем deadline аналогично
+        if 'deadline' in data and data['deadline']:
+            try:
+                date_obj = datetime.strptime(data['deadline'], '%Y-%m-%d')
+                data['deadline'] = date_obj.strftime('%d.%m.%Y')
+            except Exception as e:
+                print(f"Ошибка преобразования deadline: {e}")
+        
+        # Отладочный вывод (можно убрать в production)
+        print(f"Данные для генерации: {data}")
+        
+        # Приоритет HTML контенту из WYSIWYG редактора
+        if 'content_html' in data and data['content_html']:
+            # HTML контент уже в data, оставляем его
+            pass
+        elif 'content' in data:
+            # Используем текстовый контент
+            pass
         
         # Обработка табличных данных (если есть)
         if 'table_data' in request.form:
@@ -93,14 +121,17 @@ def generate_document():
         
         # Генерация документа
         if doc_type == 'word':
-            if not os.path.exists(template_path):
+            if not template_path or not os.path.exists(template_path):
                 # Создаем документ с нуля
                 output_filename = f"document_{timestamp}_{unique_id}.docx"
                 output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+                print(f"Создание документа с нуля. Данные: {data}")
                 generator.word_gen.create_from_scratch(data, output_path)
             else:
                 output_filename = f"document_{timestamp}_{unique_id}.docx"
                 output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
+                print(f"Используется шаблон: {template_path}")
+                print(f"Данные для замены: {data}")
                 generator.generate_word(template_path, data, output_path)
             
         elif doc_type == 'pdf':

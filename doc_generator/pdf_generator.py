@@ -51,8 +51,15 @@ class PDFGenerator:
         # Основное содержимое
         pdf.set_font("Arial", size=12)
         
-        if 'content' in data:
+        if 'content_html' in data:
+            # Используем HTML контент из WYSIWYG редактора
+            content = self._html_to_text(data['content_html'])
+        elif 'content' in data:
             content = str(data['content'])
+        else:
+            content = ''
+        
+        if content:
             # Простая обработка многострочного текста
             lines = content.split('\n')
             for line in lines:
@@ -133,4 +140,28 @@ class PDFGenerator:
         
         # Создаем PDF из данных
         return self.generate(None, data, output_path)
+    
+    def _html_to_text(self, html_content: str) -> str:
+        """
+        Конвертация HTML в простой текст
+        
+        Args:
+            html_content: HTML контент
+            
+        Returns:
+            Текстовое представление
+        """
+        if not html_content:
+            return ''
+        
+        # Удаляем HTML теги
+        text = re.sub(r'<[^>]+>', '', html_content)
+        text = text.replace('&nbsp;', ' ')
+        text = text.replace('&lt;', '<')
+        text = text.replace('&gt;', '>')
+        text = text.replace('&amp;', '&')
+        text = text.replace('&quot;', '"')
+        text = text.replace('&#39;', "'")
+        
+        return text
 

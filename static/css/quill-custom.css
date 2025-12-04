@@ -1,0 +1,100 @@
+/* Стили для Quill WYSIWYG редактора */
+
+.ql-container {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    font-size: 14px;
+    border-bottom-left-radius: 5px;
+    border-bottom-right-radius: 5px;
+    background: #fff;
+}
+
+.ql-editor {
+    min-height: 150px;
+    padding: 12px 15px;
+}
+
+.ql-toolbar {
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+    border: 1px solid #ccc;
+    background: #fafafa;
+}
+
+.ql-snow .ql-stroke {
+    stroke: #444;
+}
+
+.ql-snow .ql-fill {
+    fill: #444;
+}
+
+.ql-snow .ql-picker-label {
+    color: #444;
+}
+
+.ql-snow.ql-toolbar button:hover,
+.ql-snow .ql-toolbar button:hover,
+.ql-snow.ql-toolbar button.ql-active,
+.ql-snow .ql-toolbar button.ql-active,
+.ql-snow.ql-toolbar .ql-picker-label:hover,
+.ql-snow .ql-toolbar .ql-picker-label:hover,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active,
+.ql-snow.ql-toolbar .ql-picker-item:hover,
+.ql-snow .ql-toolbar .ql-picker-item:hover,
+.ql-snow.ql-toolbar .ql-picker-item.ql-selected,
+.ql-snow .ql-toolbar .ql-picker-item.ql-selected {
+    color: var(--primary-color);
+}
+
+.ql-snow.ql-toolbar button:hover .ql-stroke,
+.ql-snow .ql-toolbar button:hover .ql-stroke,
+.ql-snow.ql-toolbar button.ql-active .ql-stroke,
+.ql-snow .ql-toolbar button.ql-active .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-label:hover .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-label:hover .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-item:hover .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-item:hover .ql-stroke,
+.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-stroke,
+.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-stroke {
+    stroke: var(--primary-color);
+}
+
+.ql-snow.ql-toolbar button:hover .ql-fill,
+.ql-snow .ql-toolbar button:hover .ql-fill,
+.ql-snow.ql-toolbar button.ql-active .ql-fill,
+.ql-snow .ql-toolbar button.ql-active .ql-fill,
+.ql-snow.ql-toolbar .ql-picker-label:hover .ql-fill,
+.ql-snow .ql-toolbar .ql-picker-label:hover .ql-fill,
+.ql-snow.ql-toolbar .ql-picker-label.ql-active .ql-fill,
+.ql-snow .ql-toolbar .ql-picker-label.ql-active .ql-fill,
+.ql-snow.ql-toolbar .ql-picker-item:hover .ql-fill,
+.ql-snow .ql-toolbar .ql-picker-item:hover .ql-fill,
+.ql-snow.ql-toolbar .ql-picker-item.ql-selected .ql-fill,
+.ql-snow .ql-toolbar .ql-picker-item.ql-selected .ql-fill {
+    fill: var(--primary-color);
+}
+
+/* Интеграция с формой */
+.form-group #word-content-editor,
+.form-group #pdf-content-editor {
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    margin-bottom: 0.5rem;
+}
+
+.form-group #word-content-editor .ql-container,
+.form-group #pdf-content-editor .ql-container {
+    border: none;
+    border-radius: 0 0 5px 5px;
+}
+
+.form-group #word-content-editor .ql-toolbar,
+.form-group #pdf-content-editor .ql-toolbar {
+    border: none;
+    border-bottom: 1px solid var(--border-color);
+    border-radius: 5px 5px 0 0;
+}
+

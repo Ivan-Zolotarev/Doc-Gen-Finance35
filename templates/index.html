@@ -94,7 +94,9 @@
 
         <div class="form-group">
             <label>Дополнительное содержимое</label>
-            <textarea name="content" class="form-control" rows="5" placeholder="Дополнительный текст документа"></textarea>
+            <div id="word-content-editor" style="height: 200px; margin-bottom: 10px;"></div>
+            <textarea name="content" class="form-control" rows="5" placeholder="Дополнительный текст документа" style="display: none;"></textarea>
+            <small>Используйте редактор для форматирования текста</small>
         </div>
 
         <div class="form-actions">
@@ -122,7 +124,9 @@
 
         <div class="form-group">
             <label>Содержимое</label>
-            <textarea name="content" class="form-control" rows="8" placeholder="Текст документа" required></textarea>
+            <div id="pdf-content-editor" style="height: 300px; margin-bottom: 10px;"></div>
+            <textarea name="content" class="form-control" rows="8" placeholder="Текст документа" required style="display: none;"></textarea>
+            <small>Используйте редактор для форматирования текста</small>
         </div>
 
         <div class="form-group">
@@ -199,6 +203,25 @@
         });
         document.getElementById(`form-${type}`).style.display = 'block';
         document.getElementById(`form-${type}`).scrollIntoView({ behavior: 'smooth' });
+        
+        // Инициализируем WYSIWYG редактор если нужно
+        setTimeout(() => {
+            if (type === 'word' && (!window.quillEditors || !window.quillEditors['word-content-editor'])) {
+                if (typeof initQuillEditor === 'function') {
+                    initQuillEditor('word-content-editor', 'Дополнительное содержимое документа...');
+                }
+            }
+            if (type === 'pdf' && (!window.quillEditors || !window.quillEditors['pdf-content-editor'])) {
+                if (typeof initQuillEditor === 'function') {
+                    initQuillEditor('pdf-content-editor', 'Содержимое PDF документа...');
+                }
+            }
+            
+            // Инициализируем предпросмотр
+            if (typeof initDocumentPreview === 'function') {
+                initDocumentPreview();
+            }
+        }, 200);
     }
 
     function hideForm(type) {
@@ -213,7 +236,23 @@
     function handleSubmit(e) {
         e.preventDefault();
         const form = e.target;
+        
+        // Подготавливаем WYSIWYG контент перед отправкой
+        if (typeof prepareFormSubmission === 'function') {
+            prepareFormSubmission(form.id);
+        }
+        
         const formData = new FormData(form);
+        
+        // Отладочный вывод (можно убрать в production)
+        console.log('Отправка формы:', form.id);
+        for (let [key, value] of formData.entries()) {
+            if (key === 'content_html') {
+                console.log(`${key}:`, value.substring(0, 100) + '...');
+            } else {
+                console.log(`${key}:`, value);
+            }
+        }
         
         // Показываем загрузку
         document.getElementById('loading').style.display = 'flex';
