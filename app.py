@@ -16,6 +16,7 @@ project_root = Path(__file__).parent
 sys.path.insert(0, str(project_root))
 
 from doc_generator import DocumentGenerator
+from docx2pdf import convert as docx_to_pdf
 
 app = Flask(__name__)
 app.secret_key = 'doc-gen-finance35-secret-key-change-in-production'
@@ -33,7 +34,7 @@ os.makedirs('templates', exist_ok=True)
 generator = DocumentGenerator(output_dir=app.config['OUTPUT_FOLDER'])
 
 # Разрешенные расширения файлов
-ALLOWED_EXTENSIONS = {'docx', 'xlsx', 'pdf', 'html', 'json'}
+ALLOWED_EXTENSIONS = {'docx', 'json'}
 
 
 def allowed_file(filename):
@@ -119,10 +120,9 @@ def generate_document():
             elif doc_type == 'excel':
                 template_path = None  # Excel можно создавать без шаблона
         
-        # Генерация документа
+        # Генерация документа (только Word) с опциональной конвертацией в PDF
         if doc_type == 'word':
             if not template_path or not os.path.exists(template_path):
-                # Создаем документ с нуля
                 output_filename = f"document_{timestamp}_{unique_id}.docx"
                 output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
                 print(f"Создание документа с нуля. Данные: {data}")
@@ -133,25 +133,33 @@ def generate_document():
                 print(f"Используется шаблон: {template_path}")
                 print(f"Данные для замены: {data}")
                 generator.generate_word(template_path, data, output_path)
-            
-        elif doc_type == 'pdf':
-            output_filename = f"document_{timestamp}_{unique_id}.pdf"
-            output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
-            generator.generate_pdf(template_path, data, output_path)
-            
-        elif doc_type == 'excel':
-            output_filename = f"document_{timestamp}_{unique_id}.xlsx"
-            output_path = os.path.join(app.config['OUTPUT_FOLDER'], output_filename)
-            generator.generate_excel(template_path, data, output_path)
+
+            # Конвертация в PDF, если запрошено
+            convert_to_pdf = request.form.get('convert_to_pdf') == 'on'
+            if convert_to_pdf:
+                try:
+                    pdf_filename = output_filename.replace('.docx', '.pdf')
+                    pdf_path = os.path.join(app.config['OUTPUT_FOLDER'], pdf_filename)
+                    docx_to_pdf(output_path, pdf_path)
+                    # Отдаем PDF
+                    return send_file(
+                        pdf_path,
+                        as_attachment=True,
+                        download_name=pdf_filename,
+                        mimetype='application/pdf'
+                    )
+                except Exception as e:
+                    print(f"Не удалось конвертировать в PDF: {e}. Отправляем DOCX.")
+
         else:
-            return jsonify({'error': 'Неизвестный тип документа'}), 400
+            return jsonify({'error': 'Поддерживается только тип документа word'}), 400
         
-        # Возвращаем файл для скачивания
+        # Возвращаем файл для скачивания (DOCX)
         return send_file(
             output_path,
             as_attachment=True,
             download_name=output_filename,
-            mimetype='application/octet-stream'
+            mimetype='application/vnd.openxmlformats-officedocument.wordprocessingml.document'
         )
         
     except Exception as e:

@@ -5,29 +5,15 @@
 {% block content %}
 <div class="hero">
     <h1>Генератор документов</h1>
-    <p>Автоматическая генерация документов в форматах Word, PDF и Excel</p>
+    <p>Создание документов Word с возможностью конвертации в PDF</p>
 </div>
 
 <div class="document-types">
     <div class="doc-type-card" data-type="word">
         <div class="doc-icon">📝</div>
-        <h3>Word документ</h3>
-        <p>Создание документов Microsoft Word (.docx)</p>
+        <h3>Word → PDF</h3>
+        <p>Создайте документ Word и при необходимости получите PDF</p>
         <button class="btn btn-primary" onclick="showForm('word')">Создать</button>
-    </div>
-
-    <div class="doc-type-card" data-type="pdf">
-        <div class="doc-icon">📄</div>
-        <h3>PDF документ</h3>
-        <p>Генерация PDF документов</p>
-        <button class="btn btn-primary" onclick="showForm('pdf')">Создать</button>
-    </div>
-
-    <div class="doc-type-card" data-type="excel">
-        <div class="doc-icon">📊</div>
-        <h3>Excel таблица</h3>
-        <p>Создание таблиц Microsoft Excel (.xlsx)</p>
-        <button class="btn btn-primary" onclick="showForm('excel')">Создать</button>
     </div>
 </div>
 
@@ -99,85 +85,17 @@
             <small>Используйте редактор для форматирования текста</small>
         </div>
 
+        <div class="form-group">
+            <label class="checkbox-inline">
+                <input type="checkbox" name="convert_to_pdf">
+                Сохранить также в PDF
+            </label>
+            <small>После генерации Word документ будет конвертирован в PDF</small>
+        </div>
+
         <div class="form-actions">
             <button type="submit" class="btn btn-success">Сгенерировать документ</button>
             <button type="button" class="btn btn-secondary" onclick="hideForm('word')">Отмена</button>
-        </div>
-    </form>
-</div>
-
-<!-- Форма для PDF -->
-<div id="form-pdf" class="generation-form" style="display: none;">
-    <h2>Генерация PDF документа</h2>
-    <form id="pdf-form" enctype="multipart/form-data">
-        <input type="hidden" name="doc_type" value="pdf">
-        
-        <div class="form-group">
-            <label>Заголовок</label>
-            <input type="text" name="title" class="form-control" placeholder="Финансовый отчет" required>
-        </div>
-
-        <div class="form-group">
-            <label>Дата</label>
-            <input type="date" name="date" class="form-control" value="{{ today }}" required>
-        </div>
-
-        <div class="form-group">
-            <label>Содержимое</label>
-            <div id="pdf-content-editor" style="height: 300px; margin-bottom: 10px;"></div>
-            <textarea name="content" class="form-control" rows="8" placeholder="Текст документа" required style="display: none;"></textarea>
-            <small>Используйте редактор для форматирования текста</small>
-        </div>
-
-        <div class="form-group">
-            <label>Подпись</label>
-            <input type="text" name="signature" class="form-control" placeholder="Иванов И.И.">
-        </div>
-
-        <div class="form-group">
-            <label>Табличные данные (JSON)</label>
-            <textarea name="table_data" class="form-control" rows="6" placeholder='[["Заголовок1", "Заголовок2"], ["Данные1", "Данные2"]]'></textarea>
-            <small>Введите данные таблицы в формате JSON массива массивов</small>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-success">Сгенерировать PDF</button>
-            <button type="button" class="btn btn-secondary" onclick="hideForm('pdf')">Отмена</button>
-        </div>
-    </form>
-</div>
-
-<!-- Форма для Excel -->
-<div id="form-excel" class="generation-form" style="display: none;">
-    <h2>Генерация Excel таблицы</h2>
-    <form id="excel-form" enctype="multipart/form-data">
-        <input type="hidden" name="doc_type" value="excel">
-        
-        <div class="form-group">
-            <label>Заголовок отчета</label>
-            <input type="text" name="title" class="form-control" placeholder="Финансовый отчет" required>
-        </div>
-
-        <div class="form-group">
-            <label>Название листа</label>
-            <input type="text" name="sheet_name" class="form-control" placeholder="Отчет" value="Лист1">
-        </div>
-
-        <div class="form-group">
-            <label>Табличные данные (JSON)</label>
-            <textarea name="table_data" class="form-control" rows="10" placeholder='[["Месяц", "Выручка", "Расходы"], ["Январь", "35000", "28000"], ["Февраль", "38000", "30000"]]' required></textarea>
-            <small>Введите данные таблицы в формате JSON. Первая строка - заголовки.</small>
-        </div>
-
-        <div class="form-group">
-            <label>Дополнительные данные (JSON, опционально)</label>
-            <textarea name="additional_data" class="form-control" rows="4" placeholder='{"Средняя выручка": "38333 руб.", "Средние расходы": "30000 руб."}'></textarea>
-            <small>Введите дополнительные данные в формате JSON объекта</small>
-        </div>
-
-        <div class="form-actions">
-            <button type="submit" class="btn btn-success">Сгенерировать Excel</button>
-            <button type="button" class="btn btn-secondary" onclick="hideForm('excel')">Отмена</button>
         </div>
     </form>
 </div>
@@ -211,11 +129,6 @@
                     initQuillEditor('word-content-editor', 'Дополнительное содержимое документа...');
                 }
             }
-            if (type === 'pdf' && (!window.quillEditors || !window.quillEditors['pdf-content-editor'])) {
-                if (typeof initQuillEditor === 'function') {
-                    initQuillEditor('pdf-content-editor', 'Содержимое PDF документа...');
-                }
-            }
             
             // Инициализируем предпросмотр
             if (typeof initDocumentPreview === 'function') {
@@ -228,10 +141,8 @@
         document.getElementById(`form-${type}`).style.display = 'none';
     }
 
-    // Обработка форм
+    // Обработка формы (только Word)
     document.getElementById('word-form').addEventListener('submit', handleSubmit);
-    document.getElementById('pdf-form').addEventListener('submit', handleSubmit);
-    document.getElementById('excel-form').addEventListener('submit', handleSubmit);
 
     function handleSubmit(e) {
         e.preventDefault();
@@ -272,8 +183,8 @@
             const url = window.URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = formData.get('doc_type') === 'word' ? 'document.docx' : 
-                        formData.get('doc_type') === 'pdf' ? 'document.pdf' : 'document.xlsx';
+            const toPdf = formData.get('convert_to_pdf') === 'on';
+            a.download = toPdf ? 'document.pdf' : 'document.docx';
             document.body.appendChild(a);
             a.click();
             window.URL.revokeObjectURL(url);
